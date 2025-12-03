@@ -1,11 +1,12 @@
+#include "secrets.h"
 #include <WiFi.h>
 #include "web_assets.h"
 #include "Resource.h" 
 
 
 // ====== WiFi config ======
-const char* SSID     = "ssid";
-const char* PASSWORD = "password";
+const char* SSID     = WIFI_SSID;
+const char* PASSWORD = WIFI_PASSWORD;
 
 WebServer server(80);
 

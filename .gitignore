@@ -1,0 +1,30 @@
+# Arduino build files
+*.elf
+*.bin
+*.hex
+*.eep
+*.map
+
+# Build folder
+build/
+cmake-build-*/
+
+# Arduino-cli cache
+.arena/
+.cache/
+arduino-core-cache/
+arduino-preferences.txt
+
+# VSCode
+.vscode/
+*.code-workspace
+
+# Ignore Python cache
+__pycache__/
+*.pyc
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db

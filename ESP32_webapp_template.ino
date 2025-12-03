@@ -4,8 +4,8 @@
 
 
 // ====== WiFi config ======
-const char* SSID     = "MEO-944D20";
-const char* PASSWORD = "17955cfff3";
+const char* SSID     = "ssid";
+const char* PASSWORD = "password";
 
 WebServer server(80);
 

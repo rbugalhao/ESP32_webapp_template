@@ -1,11 +1,10 @@
 #include "Resource.h"
 #include <Arduino.h>
-
-
+#include "Database.h" 
 
 // @GET("/path")
 void getFunction() {
-    float temp = temperatureRead();
+    float temp = Database::getLastTemperature();
 
     // Convert to JSON for easy parsing on the web app
     String json = "{ \"temperature\": " + String(temp, 2) + " }";

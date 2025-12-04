@@ -2,7 +2,7 @@
 #include <WiFi.h>
 #include "web_assets.h"
 #include "Resource.h" 
-
+#include "Database.h"
 
 // ====== WiFi config ======
 const char* SSID     = WIFI_SSID;
@@ -41,12 +41,28 @@ void setup() {
   Serial.print("IP address: ");
   Serial.println(ipStr);
 
+  
+  Database::begin();
   webapp_begin();
 
 }
 
+long lastTempUpdate = 0;
+
 void loop() {
   server.handleClient();
+  readTemperature(lastTempUpdate);
+}
+
+// Read temperature every second and store in db
+void readTemperature(long &lastTempRead) {
+  long now = millis();
+  if (now - lastTempUpdate >= 1000) {
+      lastTempUpdate = now;
+      float temp = temperatureRead();
+      Database::setLastTemperature(temp);
+      Serial.println("Stored temperature: " + String(temp, 2) + " °C");
+  }
 }
 
 

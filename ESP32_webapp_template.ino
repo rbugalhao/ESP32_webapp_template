@@ -10,6 +10,8 @@ const char* PASSWORD = WIFI_PASSWORD;
 
 WebServer server(80);
 
+#define LED_PIN 15
+
 void webapp_begin() {
 
   // API REQUESTS
@@ -22,6 +24,38 @@ void webapp_begin() {
   server.onNotFound(handleStaticOrNotFound);
   server.begin();
   Serial.println("HTTP server started (WebApp)");
+}
+static void handleStaticOrNotFound() {
+  String path = server.uri();
+  if (path.length() == 0) {
+    path = "/";
+  }
+
+  // Já tratámos "/", aqui só tratamos ficheiros estáticos
+  if (path == "/") {
+    handleRoot();
+    return;
+  }
+
+  const WebAsset* asset = find_web_asset(path);
+  if (asset) {
+    server.send(200, asset->contentType, asset->data);
+  } else {
+    server.send(404, "text/plain", "Not found");
+  }
+}
+static void handleRoot() {
+  const WebAsset* asset = find_web_asset("/index.html");
+  if (!asset) {
+    server.send(404, "text/plain", "index.html not found");
+    return;
+  }
+
+  // Copiamos o HTML para uma String, substituímos o placeholder, e enviamos
+  String html = asset->data;
+  String ip = WiFi.localIP().toString();
+  html.replace("{{ESP_IP}}", ip);
+  server.send(200, asset->contentType, html);
 }
 
 void setup() {
@@ -44,59 +78,46 @@ void setup() {
   
   Database::begin();
   webapp_begin();
+  pinMode(LED_PIN, OUTPUT);
 
 }
 
 long lastTempUpdate = 0;
+bool ledState = false;
+long lastLedTurnOn = 0;
 
 void loop() {
+  long now = millis();
   server.handleClient();
-  readTemperature(lastTempUpdate);
+  readTemperature(now, lastTempUpdate, ledState);
+  blinkLED(now, lastLedTurnOn, ledState);
 }
 
 // Read temperature every second and store in db
-void readTemperature(long &lastTempRead) {
-  long now = millis();
+void readTemperature(long now, long &lastTempRead, bool &ledState) {
+  
   if (now - lastTempUpdate >= 1000) {
-      lastTempUpdate = now;
-      float temp = temperatureRead();
-      Database::setLastTemperature(temp);
-      Serial.println("Stored temperature: " + String(temp, 2) + " °C");
+    ledState = true;
+    lastTempUpdate = now;
+    float temp = temperatureRead();
+    Database::setLastTemperature(temp);
+    Serial.println("Stored temperature: " + String(temp, 2) + " °C");
+  }
+}
+
+// Blink LED when reading temperature
+void blinkLED(long now, long &lastLedTurnOn, bool &ledState) {
+  
+  if (ledState) {
+    digitalWrite(LED_PIN, HIGH);
+    ledState = false;
+    lastLedTurnOn = now;
+  }
+  else if (now - lastLedTurnOn >= 200) {
+    digitalWrite(LED_PIN, LOW);
   }
 }
 
 
 
-static void handleStaticOrNotFound() {
-  String path = server.uri();
-  if (path.length() == 0) {
-    path = "/";
-  }
 
-  // Já tratámos "/", aqui só tratamos ficheiros estáticos
-  if (path == "/") {
-    handleRoot();
-    return;
-  }
-
-  const WebAsset* asset = find_web_asset(path);
-  if (asset) {
-    server.send(200, asset->contentType, asset->data);
-  } else {
-    server.send(404, "text/plain", "Not found");
-  }
-}
-
-static void handleRoot() {
-  const WebAsset* asset = find_web_asset("/index.html");
-  if (!asset) {
-    server.send(404, "text/plain", "index.html not found");
-    return;
-  }
-
-  // Copiamos o HTML para uma String, substituímos o placeholder, e enviamos
-  String html = asset->data;
-  String ip = WiFi.localIP().toString();
-  html.replace("{{ESP_IP}}", ip);
-  server.send(200, asset->contentType, html);
-}

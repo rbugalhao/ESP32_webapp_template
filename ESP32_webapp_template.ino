@@ -2,7 +2,7 @@
 #include <WiFi.h>
 #include "web_assets.h"
 #include "Resource.h" 
-#include "Database.h"
+#include "FlashMemory.h"
 
 // ====== WiFi config ======
 const char* SSID     = WIFI_SSID;
@@ -76,7 +76,7 @@ void setup() {
   Serial.println(ipStr);
 
   
-  Database::begin();
+  FlashMemory::begin();
   webapp_begin();
   pinMode(LED_PIN, OUTPUT);
 
@@ -100,7 +100,7 @@ void readTemperature(long now, long &lastTempRead, bool &ledState) {
     ledState = true;
     lastTempUpdate = now;
     float temp = temperatureRead();
-    Database::setLastTemperature(temp);
+    FlashMemory::setLastTemperature(temp);
     Serial.println("Stored temperature: " + String(temp, 2) + " °C");
   }
 }

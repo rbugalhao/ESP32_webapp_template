@@ -3,7 +3,7 @@
 #include <Preferences.h>
 
 // Simple wrapper around ESP32 Preferences to act like a tiny "DB".
-class Database {
+class FlashMemory {
 public:
     // Must be called once in setup()
     static void begin();

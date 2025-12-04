@@ -1,10 +1,10 @@
 #include "Resource.h"
 #include <Arduino.h>
-#include "Database.h" 
+#include "FlashMemory.h" 
 
 // @GET("/path")
 void getFunction() {
-    float temp = Database::getLastTemperature();
+    float temp = FlashMemory::getLastTemperature();
 
     // Convert to JSON for easy parsing on the web app
     String json = "{ \"temperature\": " + String(temp, 2) + " }";

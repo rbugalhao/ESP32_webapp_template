@@ -1,6 +1,6 @@
 # ESP32-C5 Web Control Project
 
-Antes de compilar o projeto, é necessário gerar o ficheiro `web_assets.h` a partir da pasta `web/`.
+Before compiling the project, it's necessery to generate the `web_assets.h` file from the `web/` folder.
 
 Execute:
 
@@ -8,7 +8,7 @@ Execute:
 python embed_web.py
 ```
 
-Compilar:
+Compile:
 
 ```bash
 arduino-cli compile --fqbn esp32:esp32:esp32c5 .
